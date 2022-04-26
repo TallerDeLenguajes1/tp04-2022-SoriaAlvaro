@@ -18,6 +18,7 @@ void mostrarTarea(tarea * tareas);
 void mostrarTareas(tarea ** tareas, int cantTareas);
 void controlTareas(tarea **tareasR,tarea **tareasP, int cantTareas);
 void liberarTarea(tarea **tareasP,tarea **tareasR,int cantTareas);
+void buscarTarea(tarea **tareasP,tarea **tareasR, int cantTareas);
 
 int main(){
     srand(time(NULL));
@@ -42,6 +43,7 @@ int main(){
     mostrarTareas(tareasRealizadas,cantTareas);
     printf("\t\tTAREAS PENDIENTES\n\n");
     mostrarTareas(tareasPendientes,cantTareas);
+    buscarTarea(tareasPendientes,tareasRealizadas,cantTareas);
     getchar();
     liberarTarea(tareasPendientes,tareasRealizadas,cantTareas);
     free(tareasPendientes);
@@ -94,6 +96,8 @@ void mostrarTareas(tarea ** tareas, int cantTareas){
     for(int i=0;i<cantTareas;i++){
         if(tareas[i] != NULL){
             mostrarTarea(tareas[i]);
+        }else{
+            continue;
         }
     }
 }
@@ -122,5 +126,51 @@ void liberarTarea(tarea **tareasP,tarea **tareasR,int cantTareas){
           free(tareasR[i]->descripcion);
           free(tareasR[i]);
         }
+    }
+}
+void buscarTarea(tarea **tareasP,tarea **tareasR, int cantTareas){
+
+    printf("\t\t\tDonde desea buscar?\n\t\t1)En Tareas Pendientes\n\t\t2)En Tareas Realizadas\n");
+    int op;
+    scanf("%d",&op);
+    fflush(stdin);
+    getchar();
+    switch (op){
+        case 1:
+            printf("\n\t\t\tIngrese el ID \n\t\tde la tarea que desea buscar: ");           int id1;
+            scanf("%d",&id1);
+            fflush(stdin);
+            for(int i=0;i<cantTareas;i++){
+                if((i+1)==id1 && tareasP[i]!=NULL){
+                    mostrarTarea(tareasP[i]);
+                }else if(tareasP[i]==NULL && (i+1)==id1){
+                        printf("\t\tNo se encontró la tarea\n");
+                }
+                if(id1>cantTareas || cantTareas < 0){
+                    printf("\t\tNo se encontró la tarea\n");
+                }
+                if(tareasP[i]==NULL){
+                    continue;
+                }
+            }
+            break;
+        case 2:
+            printf("\n\t\t\tIngrese el ID \n\t\tde la tarea que desea buscar: ");           int id;
+            scanf("%d",&id);
+            fflush(stdin);
+            for(int i=0;i<cantTareas;i++){
+                if((i+1)==id && tareasR[i]!=NULL){
+                    mostrarTarea(tareasR[i]);
+                }else if(tareasR[i]==NULL && (i+1)==id){
+                        printf("\t\tNo se encontró la tarea\n");
+                }
+                if(id>cantTareas || cantTareas < 0){
+                    printf("\t\tNo se encontró la tarea\n");
+                }
+                if(tareasR[i]==NULL){
+                    continue;
+                }
+            }
+            break;
     }
 }
