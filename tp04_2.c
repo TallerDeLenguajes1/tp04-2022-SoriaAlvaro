@@ -137,21 +137,32 @@ void buscarTarea(tarea **tareasP,tarea **tareasR, int cantTareas){
     getchar();
     switch (op){
         case 1:
-            printf("\n\t\t\tIngrese el ID \n\t\tde la tarea que desea buscar: ");           int id1;
-            scanf("%d",&id1);
-            fflush(stdin);
+            printf("\n\t\t\tIngrese la palabra clave \n\t\tde la tarea que desea buscar: ");
+            char *aux=(char*)malloc(sizeof(char)*100);
+            fgets(aux,100,stdin);
             for(int i=0;i<cantTareas;i++){
-                if((i+1)==id1 && tareasP[i]!=NULL){
-                    mostrarTarea(tareasP[i]);
-                }else if(tareasP[i]==NULL && (i+1)==id1){
-                        printf("\t\tNo se encontró la tarea\n");
-                }
-                if(id1>cantTareas || cantTareas < 0){
-                    printf("\t\tNo se encontró la tarea\n");
-                }
-                if(tareasP[i]==NULL){
-                    continue;
-                }
+               if(tareasP!=NULL){
+                    int tam1= strlen(tareasP[i]->descripcion),
+                    tam2=strlen(aux), j=0;
+                    char c;
+                    if(tam2 > tam1){
+                        printf("\t\tLa palabra buscada\n\t\tes mas grande\n");
+                        return NULL;
+                    }else{
+                        c=aux[0];
+                        while (j < tam1)
+                        {
+                            if(tareasP[i]->descripcion[j]== c){
+                                if(strncmp(&tareasP[i]->descripcion[j],aux,tam2)==0){
+                                    mostrarTarea(tareasP[i]);
+                                }
+                            }
+                            j++;
+                        }
+                    }
+               }else{
+                   continue;
+               }
             }
             break;
         case 2:
