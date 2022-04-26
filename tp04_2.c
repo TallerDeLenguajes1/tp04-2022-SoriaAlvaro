@@ -4,98 +4,123 @@
 #include <time.h>
 #include <stdbool.h>
 
-struct Tarea {
+struct Tareas {
     int tareaID; //Numerado en ciclo iterativo
     char *descripcion;
     int duracion; //entre 10-100
 };
+typedef struct Tareas tarea;
 
 
+tarea * cargarTareas(int iD);
 bool confirmarTarea();
+void mostrarTarea(tarea * tareas);
+void mostrarTareas(tarea ** tareas, int cantTareas);
+void controlTareas(tarea **tareasR,tarea **tareasP, int cantTareas);
+void liberarTarea(tarea **tareasP,tarea **tareasR,int cantTareas);
 
-int main (){
-    int cantTareas;
-    printf("Ingrese la cantidad de tareas que quieres cargar: ");
-    scanf("%d", &cantTareas);
-    getchar();
-
-    //Asignando memoria dinamica a puntero de estructuras
-    struct Tarea **tareasPendientes, **tareasRealizadas;
-    tareasPendientes=(struct Tarea**)malloc(sizeof(struct Tarea*)*cantTareas);
-    tareasRealizadas=(struct Tarea**)malloc(sizeof(struct Tarea*)*cantTareas);
-
-
+int main(){
     srand(time(NULL));
 
-    //Asignando memoria dinamica a buffer de 200 caracteres
-    char *buffer;
-    buffer=(char*)malloc(sizeof(char)*200);
+    printf("\t\tIngrese la cantidad de tareas: ");
+    int cantTareas;
+    scanf("%d",&cantTareas);
+    getchar();
+    fflush(stdin);
+    
+    tarea **tareasPendientes,**tareasRealizadas;
+    tareasPendientes=(tarea**)malloc(sizeof(tarea*)*cantTareas);
+    tareasRealizadas=(tarea**)malloc(sizeof(tarea*)*cantTareas);
 
-    for(int i=0; i<cantTareas; i++){
-        //Asignando memoria dinamica para estructuras
-        tareasPendientes[i]=(struct Tarea*) malloc(sizeof(struct Tarea));
-        tareasPendientes[i]->tareaID=i+1;
-        printf("\nIngrese la descripcion: %d\n",i+1);
-        fgets(buffer,200,stdin);
-        fflush(stdin);
-        //Asignando memoria dinamica para caracteres
-        tareasPendientes[i]->descripcion=(char*)malloc(sizeof(char)*(strlen(buffer)+1));
-        strcpy(tareasPendientes[i]->descripcion,buffer);
-        tareasPendientes[i]->duracion=rand()%(100-10+1)+10;
-        printf("\n===================================================\n\n");
+    for(int i=0; i < cantTareas; i++){
+        tareasPendientes[i]=cargarTareas((i+1));
     }
-
-    free(buffer);
-
-    printf("\n\tTAREAS PENDIENTES: \n\n===================================================\n");
-    for(int i=0;i<cantTareas;i++){
-        printf("ID %d\n\n", tareasPendientes[i]->tareaID);
-/*         printf("\n"); */
-        puts(tareasPendientes[i]->descripcion);
-/*         printf("\n"); */
-        printf("duración: %d\n", tareasPendientes[i]->duracion);
-        printf("===================================================\n");
-    }
-
-    for(int i=0;i<cantTareas;i++){
-        if(confirmarTarea()){
-            //Asignando memoria dinamica para estructuras cuando el valor sea true
-            tareasRealizadas[i]=(struct Tarea*) malloc(sizeof(struct Tarea));
-            //pasando las tareas relaizadas a la otra estructura
-            tareasRealizadas[i]=tareasPendientes[i];
-        }
-    }
-
-    printf("\n\tTAREAS REALIZADAS: \n\n===================================================\n");
-    for(int i=0;i<cantTareas;i++){
-        printf("ID %d\n\n", tareasRealizadas[i]->tareaID);
-/*         printf("\n"); */
-        puts(tareasRealizadas[i]->descripcion);
-/*         printf("\n"); */
-        printf("duración: %d\n", tareasRealizadas[i]->duracion);
-        printf("===================================================\n");
-    }
-
-    for(int i=0;i<cantTareas;i++){
-        free(tareasPendientes[i]);
-        free(tareasRealizadas[i]);
-    }
-
+    printf("\t\tTAREAS PENDIENTES\n\n");
+    mostrarTareas(tareasPendientes,cantTareas);
+    controlTareas(tareasRealizadas,tareasPendientes,cantTareas);
+    printf("\t\tTAREAS REALIZADAS\n\n");
+    mostrarTareas(tareasRealizadas,cantTareas);
+    printf("\t\tTAREAS PENDIENTES\n\n");
+    mostrarTareas(tareasPendientes,cantTareas);
+    getchar();
+    liberarTarea(tareasPendientes,tareasRealizadas,cantTareas);
     free(tareasPendientes);
     free(tareasRealizadas);
 
     return 0;
 }
 
+tarea * cargarTareas(int iD){
+    tarea * nTarea=(tarea*)malloc(sizeof(tarea));
+    
+    nTarea->tareaID=iD;
+
+    printf("\t\tIngrese la descripción de la tarea: %d\n",nTarea->tareaID);
+    char *buffer=(char*)malloc(sizeof(char)*200);
+    fgets(buffer,200,stdin);
+    fflush(stdin);
+
+    nTarea->descripcion=(char*)malloc(sizeof(char)*(strlen(buffer)+1));
+    strcpy(nTarea->descripcion,buffer);
+    free(buffer);
+    nTarea->duracion=rand()%(100-10+1)+10;
+
+    return nTarea;
+}
+
 bool confirmarTarea(){
-    printf("\tTerminó la tarea?.\n\tEscriba 'y' para confirmar.\n\tCualquier otra letra para denegar.\n\n");
+    printf("\t\tRealizó la tarea?\n\t\tY para confirmar.\n\t\tCualquier letra para denegar.\n");
     char letra;
     scanf("%c",&letra);
-    getchar();
     fflush(stdin);
-    if(letra == 'y' || letra=='Y'){
+    getchar();
+    
+    if(letra == 'y' || letra == 'Y'){
         return true;
     }else{
         return false;
+    }
+}
+
+void mostrarTarea(tarea * tareas){
+    printf("\t\tID tarea %d\n", tareas->tareaID);
+    printf("\t\t%s",tareas->descripcion);
+    /* puts(tareas->descripcion); */
+    printf("\t\tDuración %d",tareas->duracion);
+    printf("\n=\t*\t=\t*\t=\t*\t=\t*\t=\t*\t=\n");
+}
+
+void mostrarTareas(tarea ** tareas, int cantTareas){
+    for(int i=0;i<cantTareas;i++){
+        if(tareas[i] != NULL){
+            mostrarTarea(tareas[i]);
+        }
+    }
+}
+
+void controlTareas(tarea **tareasR,tarea **tareasP, int cantTareas){
+    for(int i=0;i<cantTareas;i++){
+       printf("\t\tTarea %d\n", i+1);
+       
+       if(confirmarTarea()){
+           tareasR[i]=(tarea*)malloc(sizeof(tarea));
+           tareasR[i]=tareasP[i];
+           tareasP[i]=NULL;
+       }else{
+           tareasR[i]=NULL;
+       }
+    }
+}
+
+void liberarTarea(tarea **tareasP,tarea **tareasR,int cantTareas){
+    for(int i=0;i<cantTareas;i++){
+        if(tareasP[i]!=NULL){
+          free(tareasP[i]->descripcion);
+          free(tareasP[i]);
+        }
+        if(tareasR[i]!=NULL){
+          free(tareasR[i]->descripcion);
+          free(tareasR[i]);
+        }
     }
 }
