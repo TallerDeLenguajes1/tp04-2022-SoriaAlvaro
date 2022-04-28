@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include <stdbool.h>
 struct Tarea{
     int tareaId;//numerado en ciclo iterativo
     char *descripcion;
@@ -20,6 +20,7 @@ ntarea * cargarNodo(int id);
 void crearNodo(ntarea ** start, int id);
 void mostrarTareas(ntarea * start);
 void liberar(ntarea ** start);
+bool confirmarTarea();
 //          Main
 int main(){
     srand(time(NULL));
@@ -98,4 +99,39 @@ void mostrarTareas(ntarea * start)
         nAux = nAux->next;
     }
     
+}
+
+bool confirmarTarea()
+{
+    printf("ELIJA UNA OPCIÓN:\nY para confirmar\nN para denegar.\n");
+    char letra;
+    do
+    {
+        scanf("%c",&letra);
+        if(letra != 'y' && letra != 'Y' && letra != 'n' && letra != 'N')
+        {
+            printf("ELIJA UNA OPCIÓN CORRECTA");
+        }
+        if(letra == 'y' || letra == 'Y'){
+            return true;
+        }
+        if(letra == 'n' || letra == 'N'){
+            return false;
+        }
+    }while(letra != 'y' && letra != 'Y' && letra != 'n' && letra != 'N');
+}
+
+void moverTareas(ntarea ** tPendiente, ntarea ** tRealizadas)
+{
+    ntarea * tAux, * tmov;
+    tAux = *tPendiente;
+    while(tAux->next != NULL)
+    {
+        if(confirmarTarea())
+        {
+            tmov=tAux;
+            *tRealizadas=tmov->next;
+        }
+        tAux=tAux->next;
+    }
 }
