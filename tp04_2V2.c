@@ -18,22 +18,31 @@ typedef struct Nodo ntarea;
 //          Funciones
 ntarea * cargarNodo(int id);
 void crearNodo(ntarea ** start, int id);
+void crearNodo2(ntarea ** start, int cantT);
 void mostrarTareas(ntarea * start);
 void liberar(ntarea ** start);
-bool confirmarTarea();
+bool confirmarTarea(ntarea * tpend);
+void moverTareas(ntarea * tPendiente, ntarea ** tRealizadas);
+void mostrarNumTarea(ntarea * tarea);
+void buscarTareasID(ntarea * tarea, int cantTareas);
 //          Main
 int main(){
+    printf("\n--\t--\t--\t-- Tareas --\t--\t--\t--\n");
     srand(time(NULL));
     ntarea * tareaP=NULL;
-    printf("Ingrese la cantidad de tareas: ");
+    ntarea * tareaR=NULL;
+    printf("\t\t\tIngrese la cantidad de tareas: ");
     int cantTareas;
     scanf("%d",&cantTareas);
     getchar();
     fflush(stdin);
-    for(int i=0;i<cantTareas;i++){
-        crearNodo(&tareaP,i);
-    }
+    crearNodo2(&tareaP,cantTareas);
+    printf("\n--\t--\t--\t-- Tareas Pendientes \t--\t--\t--\t--\n");
     mostrarTareas(tareaP);
+    buscarTareasID(tareaP,cantTareas);
+    moverTareas(tareaP,&tareaR);
+    printf("\n--\t--\t--\t-- Tareas Realizadas \t--\t--\t--\t--\n");
+    mostrarTareas(tareaR);
     liberar(&tareaP);
     return 0;
 }
@@ -71,6 +80,24 @@ void crearNodo(ntarea ** start, int id)
         *start=nNodo;
     }
 }
+void crearNodo2(ntarea ** start, int cantT)
+{
+        ntarea * nNodo;
+    for(int i=0;i<cantT;i++)
+    {
+        nNodo=cargarNodo(i);
+        if(*start == NULL)
+        {
+            *start = nNodo;
+        }
+        else
+        {
+            nNodo->next=*start;
+            *start=nNodo;
+        }
+    }
+    
+}
 
 void liberar(ntarea ** start)
 {
@@ -92,22 +119,24 @@ void mostrarTareas(ntarea * start)
     nAux=start;
     while (nAux != NULL)
     {
-        printf("ID %d\n",nAux->T.tareaId);
-        //printf("Descripción: %s\n",nAux->T.descripcion);
-        puts(nAux->T.descripcion);
-        printf("Duracioń: %d\n",nAux->T.duracion);
+        printf("\n--\t--\t--\t--\t--\t--\t--\t--\t--\t--\n");
+        printf("\n\t\t\tTarea %d\n\t\t\tDescripción: %s\t\t\tDuración: %d\n",nAux->T.tareaId,nAux->T.descripcion,nAux->T.duracion);
         nAux = nAux->next;
     }
     
 }
 
-bool confirmarTarea()
+bool confirmarTarea(ntarea * tpend)
 {
-    printf("ELIJA UNA OPCIÓN:\nY para confirmar\nN para denegar.\n");
+    printf("\n--\t--\t--\t--\t--\t--\t--\t--\t--\t--\n");
+    printf("\t\t\tTerminó la tarea %d?\n\t\tY para confirmar\t\tN para denegar.\n",tpend->T.tareaId);
     char letra;
     do
     {
+        fflush(stdin);
         scanf("%c",&letra);
+        getchar();
+
         if(letra != 'y' && letra != 'Y' && letra != 'n' && letra != 'N')
         {
             printf("ELIJA UNA OPCIÓN CORRECTA");
@@ -121,17 +150,67 @@ bool confirmarTarea()
     }while(letra != 'y' && letra != 'Y' && letra != 'n' && letra != 'N');
 }
 
-void moverTareas(ntarea ** tPendiente, ntarea ** tRealizadas)
+void moverTareas(ntarea * tPendiente, ntarea ** tRealizadas)
 {
-    ntarea * tAux, * tmov;
-    tAux = *tPendiente;
-    while(tAux->next != NULL)
+    ntarea * tAux= tPendiente;
+    while (tAux != NULL)
     {
-        if(confirmarTarea())
+        if(confirmarTarea(tAux))
         {
-            tmov=tAux;
-            *tRealizadas=tmov->next;
+            ntarea *nuevoNodo = tAux;
+            tAux = tAux->next;
+            nuevoNodo->next = *tRealizadas;
+            *tRealizadas = nuevoNodo;
         }
-        tAux=tAux->next;
+        else
+        {
+            tAux = tAux->next;
+        }
+    }
+    
+}
+
+void mostrarNumTarea(ntarea * tarea)
+{
+    while(tarea != NULL)
+    {   printf("Tarea %d \t",tarea->T.tareaId);
+        tarea=tarea->next;
     }
 }
+void buscarTareasID(ntarea * tarea, int cantTareas)
+{
+    printf("\n--\t--\t-- Buscar Tareas Pendientes --\t--\t--\n");
+/*     mostrarNumTarea(tarea); */
+    ntarea * aux=tarea;
+    while(aux != NULL)
+    {
+        printf("Tarea %d \t",aux->T.tareaId);
+        aux=aux->next;
+    }
+    printf("\n\t\t\tIngrese el id que quiere buscar: ");
+    int id;
+    do
+    {
+        fflush(stdin);
+        scanf("%d",&id);
+        getchar();
+        if(!(id > 0 && id<=cantTareas))
+        {
+            printf("ELIJA UNA OPCIÓN CORRECTA: ");
+        }
+        else{
+            while(tarea != NULL)
+            {
+                if(tarea != NULL)
+                {
+                    if(tarea->T.tareaId==id)
+                    {
+                        printf("\n\t\t\tTarea %d\n\t\t\tDescripción: %s\t\t\tDuración: %d\n",tarea->T.tareaId,tarea->T.descripcion,tarea->T.duracion);
+                    }
+                }
+                tarea= tarea->next;
+            }
+        }
+    }while(!(id > 0 && id<=cantTareas));
+}
+
