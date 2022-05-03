@@ -22,7 +22,7 @@ void crearNodo2(ntarea ** start, int cantT);
 void mostrarTareas(ntarea * start);
 void liberar(ntarea ** start);
 bool confirmarTarea(ntarea * tpend);
-void moverTareas(ntarea * tPendiente, ntarea ** tRealizadas);
+void moverTareas(ntarea ** tPendiente, ntarea ** tRealizadas);
 void mostrarNumTarea(ntarea * tarea);
 void buscarTareasID(ntarea * tarea, int cantTareas);
 //          Main
@@ -39,11 +39,14 @@ int main(){
     crearNodo2(&tareaP,cantTareas);
     printf("\n--\t--\t--\t-- Tareas Pendientes \t--\t--\t--\t--\n");
     mostrarTareas(tareaP);
-    buscarTareasID(tareaP,cantTareas);
-    moverTareas(tareaP,&tareaR);
+    /* buscarTareasID(tareaP,cantTareas); */
+    moverTareas(&tareaP,&tareaR);
     printf("\n--\t--\t--\t-- Tareas Realizadas \t--\t--\t--\t--\n");
     mostrarTareas(tareaR);
-    liberar(&tareaP);
+    printf("\n--\t--\t--\t-- Tareas Pendientes \t--\t--\t--\t--\n");
+    mostrarTareas(tareaP);
+    /* liberar(&tareaP);
+    liberar(&tareaR); */
     return 0;
 }
 
@@ -56,7 +59,7 @@ ntarea * cargarNodo(int id)
     printf("Ingrese una descripción: ");
     char * buffer=(char*)malloc(sizeof(char)*200);
     fgets(buffer,200,stdin);
-    /* getchar(); */
+    getchar();
     fflush(stdin);
     nodoAux->T.descripcion=(char*)malloc(sizeof(char)*(strlen(buffer)+1));
     strcpy(nodoAux->T.descripcion,buffer);
@@ -117,13 +120,17 @@ void mostrarTareas(ntarea * start)
 {
     ntarea * nAux;
     nAux=start;
-    while (nAux != NULL)
+    if(start!=NULL)
     {
-        printf("\n--\t--\t--\t--\t--\t--\t--\t--\t--\t--\n");
-        printf("\n\t\t\tTarea %d\n\t\t\tDescripción: %s\t\t\tDuración: %d\n",nAux->T.tareaId,nAux->T.descripcion,nAux->T.duracion);
-        nAux = nAux->next;
+        while (nAux != NULL)
+        {
+
+                printf("\n--\t--\t--\t--\t--\t--\t--\t--\t--\t--\n");
+                printf("\n\t\t\tTarea %d\n\t\t\tDescripción: %s\t\t\tDuración: %d\n",nAux->T.tareaId,nAux->T.descripcion,nAux->T.duracion);
+                nAux = nAux->next;
+
+        }
     }
-    
 }
 
 bool confirmarTarea(ntarea * tpend)
@@ -150,17 +157,20 @@ bool confirmarTarea(ntarea * tpend)
     }while(letra != 'y' && letra != 'Y' && letra != 'n' && letra != 'N');
 }
 
-void moverTareas(ntarea * tPendiente, ntarea ** tRealizadas)
+void moverTareas(ntarea ** tPendiente, ntarea ** tRealizadas)
 {
-    ntarea * tAux= tPendiente;
+    ntarea * tAux= *tPendiente;
     while (tAux != NULL)
     {
         if(confirmarTarea(tAux))
         {
-            ntarea *nuevoNodo = tAux;
-            tAux = tAux->next;
+            ntarea *nuevoNodo =(ntarea*)malloc(sizeof(ntarea));
+            nuevoNodo = tAux;
             nuevoNodo->next = *tRealizadas;
-            *tRealizadas = nuevoNodo;
+            *tRealizadas = nuevoNodo; 
+            ntarea *quitar= tAux;
+            tAux = tAux->next;
+            liberar(&quitar);
         }
         else
         {
